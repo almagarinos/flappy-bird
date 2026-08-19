@@ -1,0 +1,110 @@
+/* Pantalla completa */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #222222;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    overflow: hidden;
+}
+
+#game-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#game {
+    /* Para quitar barras de scroll */
+    display: block;
+
+    /* Color del cielo del fondo */
+    background: #2bbfff;
+
+    /* Para pantallas táctiles */
+    touch-action: none;
+
+    /* Para clics de ratón */
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#data-container {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#data {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#score {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+
+    color: whitesmoke;
+    font-size: 2rem;
+    font-weight: bold;
+
+    /* Para que se pueda pulsar encima
+    sin que influya en el juego, para
+    que no se seleccione con doble clic
+    y no falle el vuelo del pájaro */
+    pointer-events: none;
+}
+
+#message {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 90%;
+    margin: 5%;
+    top: 22px;
+    text-align: start;
+    color: #222222;
+    pointer-events: none;
+}
+
+#message * {
+    margin-bottom: 0px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+@media (min-width: 450px) {
+    #game-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #data-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #data {
+        width: 450px;
+        height: 100dvh;
+        max-height: 800px;
+        position: relative;
+    }
+}
+
+@media (min-width: 450px) and (min-height: 800px) {
+    #game {
+        border-radius: 22px;
+    }
+}
