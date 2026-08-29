@@ -1,12 +1,35 @@
 // Variables globales y configuración
 
-// Configuración de la partida
-const GAME_CONFIG = {
-    gravity: 0.2, // Velocidad de caída. Cuanto más baja sea, más despacio cae el pájaro.
-    jumpForce: -3, // Longitud del salto, puede ser decimal. Cuanto más corto, más manejable.
-    pipeGap: 250, // Espacio vertical en cada columna de tuberías. Cuanto mayor: más fácil.
-    pipeSpeed: 0.9 // Velocidad del movimiento de las tuberías. Cuanto menor: más lentas.
+// Niveles de dificultad de la partida
+const DIFFICULTIES = {
+
+    easy: {
+        levelName: "nivel fácil", // Nombre del nivel de dificultad. Se usará en el ranking.
+        gravity: 0.2, // Velocidad de caída. Cuanto más baja sea, más despacio cae el pájaro.
+        jumpForce: -3, // Longitud del salto, puede ser decimal. Cuanto más corto, más manejable.
+        pipeGap: 250, // Espacio vertical en cada columna de tuberías. Cuanto mayor: más fácil.
+        pipeSpeed: 0.9 // Velocidad del movimiento de las tuberías. Cuanto menor: más lentas.
+    },
+
+    normal: {
+        levelName: "nivel normal",
+        gravity: 0.25,
+        jumpForce: -4.5,
+        pipeGap: 210,
+        pipeSpeed: 1.8
+    },
+
+    hard: {
+        levelName: "nivel difícil",
+        gravity: 0.30,
+        jumpForce: -6,
+        pipeGap: 180,
+        pipeSpeed: 3
+    }
 };
+
+// Configuración de la partida
+let GAME_CONFIG = DIFFICULTIES.easy; // Por defecto es el nivel fácil
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
@@ -24,67 +47,150 @@ if (window.innerHeight < 800) {
 }
 
 const scoreElement = document.getElementById("score");
-const messageElement = document.getElementById("message");
+const dialogRanking = document.getElementById("dialogoRanking");
+const dialogOrientacion = document.getElementById("dialogoOrientacion");
 
 
 
 // Estado global
-const bird = {
-    x: 80,
-    y: 120,
-    radius: 16,
-    velocity: 0,
-    gravity: GAME_CONFIG.gravity,
-    jumpForce: GAME_CONFIG.jumpForce
+const gameState = {
+    screen: "menu",
+    difficulty: null,
+    score: 0,
+    bird: {
+        x: 80,
+        y: 120,
+        radius: 16,
+        velocity: 0
+    },
+    pipes: []
 };
-
-const pipes = [];
-
-let score = 0;
-let started = false;
-let gameOver = false;
 // Fin del estado global
 
 
 
 // Funciones de la aplicación
 
-// Crear nueva partida con sus valores iniciales
-function restart() {
-    bird.y = 120; // Mismo valor que al iniciarlo en el estado global
-    bird.velocity = 0; // Mismo valor que al iniciarlo en el estado global
+// Se comprueba que la pantalla del dispositivo es suficiente en altura
+function visualizacionCorrecta() {
+    // Si está en la orientación horizontal en un dispositivo móvil pequeño, lo indica
+    if (window.innerHeight < window.innerWidth && window.innerHeight < 450) {
+        dialogOrientacion.showModal();
+        return false;
+    } else {
+        return true;
+    }
+}
 
-    pipes.length = 0;
 
-    score = 0; // Contador de puntos a cero
-    scoreElement.textContent = 0;
 
-    started = false;
-    gameOver = false;
+// Gestión de localStorage
+function getScores() {
+    // Si no hay datos, se devuelve un objeto vacío
+    return JSON.parse(localStorage.getItem("flappy-scores")) || [];
+}
 
-    messageElement.classList.remove("hidden");
+function saveScores(scores) {
+    localStorage.setItem("flappy-scores", JSON.stringify(scores));
+}
+// Fin de la gestión de localStorage
+
+
+
+// Ranking de puntuaciones
+function renderLeaderboard() {
+    const scores = getScores();
+
+    if (scores.length == 0) { // Si el objeto viene vacío
+        document .getElementById("leaderboard").innerHTML = `Aún no hay datos guardados.`;
+    } else {
+
+        document.getElementById("leaderboard").innerHTML = `
+            <ol>
+                ${
+                    scores.map(score => `
+                        <li>
+                            ${score.user} - ${score.score} (${score.difficulty})
+                        </li>
+                    `).join("")
+                }
+            </ol>
+        `;
+    }
+}
+
+
+
+// Gestión pantallas a mostrar según el estado del juego
+function updateScreens() {
+    document.querySelectorAll(".screen").forEach(screen => screen.classList.add("hidden"));
+    document.getElementById("game").classList.add("filtered");
+    scoreElement.classList.add("hidden");
+
+    switch (gameState.screen) {
+        case "menu":
+            document.getElementById("menu-screen").classList.remove("hidden");
+            break;
+
+        case "tutorial":
+            document.getElementById("tutorial-screen").classList.remove("hidden");
+            break;
+
+        case "playing":
+            document.getElementById("game").classList.remove("filtered");
+            scoreElement.classList.remove("hidden");
+
+            // Subimos hasta arriba por si acaso venimos de un zoom anterior que nos descoloca el canvas
+            setTimeout(() => {
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            }, 10); // Así da tiempo a los iPhone a procesar el clic del botón antes de hacer scroll, es un bug de iOS
+            
+            break;
+
+        case "game-over":
+            document.getElementById("game-over-screen").classList.remove("hidden");
+            //document.getElementById("player-name").focus();
+            break;
+
+        case "leaderboard":
+            document.getElementById("leaderboard-screen").classList.remove("hidden");
+            renderLeaderboard();
+            break;
+    }
+}
+
+// Cambio de pantalla
+function changeScreen(nextScreen) {
+    if(visualizacionCorrecta()){
+        gameState.screen = nextScreen;
+        updateScreens();
+    }
+}
+
+
+
+// Puntuación final y cambio a pantalla de game over
+function loseGame() {
+    document.getElementById("final-score").textContent = gameState.score;
+    changeScreen("game-over");
 }
 
 
 
 // Salto del pájaro gracias a su aleteo
 function jump() {
-    if (gameOver) {
-        restart();
+    if (gameState.screen !== "playing") {
         return;
     }
 
-    started = true;
-    messageElement.classList.add("hidden");
-
-    bird.velocity = bird.jumpForce;
+    gameState.bird.velocity = GAME_CONFIG.jumpForce;
 }
 
 
 
 // Crear cada tubería
 function createPipe() {
-    pipes.push({
+    gameState.pipes.push({
         /*
          * Esta variable x es el espacio horizontal entre columnas de tuberías.
          * Mínimo (más difícil): canvas.width; máximo (más fácil): canvas.width * 2
@@ -104,50 +210,50 @@ function createPipe() {
 
 // Física del pájaro
 function updateBird() {
-    bird.velocity += bird.gravity;
+    const bird = gameState.bird;
+
+    bird.velocity += GAME_CONFIG.gravity;
     bird.y += bird.velocity;
 
     if (bird.y < 0 || bird.y > canvas.height) {
-        gameOver = true;
+        loseGame();
     }
 }
 
 // Física de las tuberías
 function updatePipes() {
-    pipes.forEach(pipe => {
+    const bird = gameState.bird;
+
+    gameState.pipes.forEach(pipe => {
 
         pipe.x -= GAME_CONFIG.pipeSpeed;
 
-        const insideX =
+        const collisionX =
             bird.x + bird.radius > pipe.x &&
             bird.x - bird.radius < pipe.x + pipe.width;
 
-        const hitTop =
-            bird.y - bird.radius < pipe.topHeight;
-
-        const hitBottom =
+        const collisionY =
+            bird.y - bird.radius < pipe.topHeight ||
             bird.y + bird.radius > pipe.topHeight + pipe.gap;
 
-        if (insideX && (hitTop || hitBottom)) {
-            gameOver = true;
+        if (collisionX && collisionY) {
+            loseGame();
         }
 
         if (!pipe.passed && pipe.x + pipe.width < bird.x) {
             pipe.passed = true;
-            score++;
+            gameState.score++;
 
-            scoreElement.textContent = score;
+            scoreElement.textContent = gameState.score;
         }
     });
 
-    while (
-        pipes.length &&
-        pipes[0].x + pipes[0].width < 0
-    ) {
-        pipes.shift();
-    }
+    gameState.pipes =
+        gameState.pipes.filter(
+            pipe => pipe.x > -100
+        );
 
-    const lastPipe = pipes.at(-1);
+    const lastPipe = gameState.pipes.at(-1);
 
     if (!lastPipe || lastPipe.x < 220) {
         createPipe();
@@ -162,12 +268,12 @@ function drawBird() {
 
     // Mover el origen al centro del pájaro
     ctx.translate(
-        bird.x,
-        bird.y
+        gameState.bird.x,
+        gameState.bird.y
     );
 
     // Inclinación según la velocidad
-    ctx.rotate(bird.velocity * 0.05);
+    ctx.rotate(gameState.bird.velocity * 0.05);
 
 
 
@@ -217,7 +323,7 @@ function drawBird() {
 function drawPipes() {
     ctx.fillStyle = "#008866";
 
-    pipes.forEach(pipe => {
+    gameState.pipes.forEach(pipe => {
 
         ctx.fillRect(
             pipe.x,
@@ -252,14 +358,45 @@ function renderGame() {
 
 
 
+// Crear nueva partida con sus valores iniciales
+function initializeGame() {
+    gameState.score = 0; // Contador de puntos a cero
+    gameState.bird = {
+        x: 80,
+        y: 120, // Mismo valor que al iniciarlo en el estado global
+        radius: 16,
+        velocity: 0 // Mismo valor que al iniciarlo en el estado global
+    };
+    gameState.pipes = [];
+    scoreElement.textContent = 0;
+}
+
+// Comenzar juego tras seleccionar nivel de dificultad
+function startGame(level) {
+    gameState.difficulty = DIFFICULTIES[level].levelName;
+    GAME_CONFIG = DIFFICULTIES[level];
+    initializeGame();
+    changeScreen("playing");
+}
+
+
+
 // Game loop de la aplicación
-function gameLoop() {
-    if (started && !gameOver) {
+function updateGame() {
+    // Esta es una variante de comprobación de visualizacionCorrecta() para evitar trampas
+    if (window.innerHeight < window.innerWidth && window.innerHeight < 450) {
+        return; // Lo interesante es que esto también sirve como pausa del juego sin errores
+    } else { // Sólo continúa el juego con la orientación y altura mínima adecuada
         updateBird();
         updatePipes();
     }
+}
 
-    renderGame();
+function gameLoop() {
+    if (gameState.screen === "playing") {
+        updateGame();
+        renderGame();
+    }
 
     requestAnimationFrame(gameLoop);
 }
@@ -269,15 +406,94 @@ function gameLoop() {
 
 // Eventos de la aplicación
 
+// Eventos de clic
+document.querySelectorAll("[data-level]").forEach(boton => {
+    boton.addEventListener( "click", () => {
+        if(visualizacionCorrecta()){
+            startGame(boton.dataset.level);
+        }
+    });
+});
+
+document.getElementById("show-tutorial").addEventListener("click",() => changeScreen("tutorial"));
+
+document.getElementById("show-ranking").addEventListener("click",() => changeScreen("leaderboard"));
+
+document.getElementById("back-menu").addEventListener("click",() => changeScreen("menu"));
+
+document.getElementById("continue-to-menu").addEventListener("click",() => {
+    // Subimos hasta arriba por si acaso tras manejar el input con el teclado táctil hay un descoloque del scroll
+    setTimeout(() => {
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }, 10); // Así da tiempo a los iPhone a procesar el clic del botón antes de hacer scroll, es un bug de iOS
+
+    changeScreen("menu");
+});
+
+// Guardar puntuación
+document.getElementById("save-score").addEventListener("click", () => {
+    const name = document.getElementById("player-name").value.trim();
+
+    if (!name) return;
+
+    const scores = getScores();
+
+    scores.push({
+        user: name,
+        score: gameState.score,
+        difficulty: gameState.difficulty
+    });
+
+    scores.sort( (a, b) => b.score - a.score );
+
+    scores.splice(10);
+
+    saveScores(scores);
+    
+    // Subimos hasta arriba por si acaso tras manejar el input con el teclado táctil hay un descoloque del scroll
+    setTimeout(() => {
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }, 10); // Así da tiempo a los iPhone a procesar el clic del botón antes de hacer scroll, es un bug de iOS
+
+    changeScreen("leaderboard");
+});
+
+document.getElementById("go-to-menu").addEventListener("click",() => changeScreen("menu"));
+
+document.getElementById("clear-all").addEventListener("click",() => dialogRanking.showModal());
+
+document.getElementById("cancel-deletion").addEventListener("click",() => dialogRanking.close());
+
+document.getElementById("confirm-deletion").addEventListener("click",() => {
+    localStorage.clear();
+    document.getElementById("leaderboard").innerHTML = `Acabas de borrar estos datos.`;
+    dialogRanking.close();
+});
+
+
+
 // Listener de teclado
 window.addEventListener("keydown", event => {
-    if (event.code === "Space") {
+    if (gameState.screen !== "playing") {
+        return;
+    }
+
+    // Ayuda a volar más rápido usando varias teclas seguidas
+    if (event.key === 'e' || event.key === 'E' ||
+        event.key === 'f' || event.key === 'F' ||
+        event.key === 'j' || event.key === 'J' ||
+        event.key === 'i' || event.key === 'I' ||
+        event.code === "Space") {
         jump();
     }
 });
 
 // Listener de ratón
 window.addEventListener('mousedown', function(e) {
+    if (gameState.screen !== "playing") {
+        return;
+    }
+
     // Evita la selección de texto y el comportamiento de arrastre por defecto
     e.preventDefault();
     
@@ -287,6 +503,10 @@ window.addEventListener('mousedown', function(e) {
 
 // Listener de pantalla táctil
 window.addEventListener('touchstart', function(e) {
+    if (gameState.screen !== "playing") {
+        return;
+    }
+
     // Evita el comportamiento por defecto (scroll, zoom o selección)
     e.preventDefault();
 
@@ -297,4 +517,6 @@ window.addEventListener('touchstart', function(e) {
 
 
 // Iniciar la aplicación
+visualizacionCorrecta();
+updateScreens();
 gameLoop();

@@ -10,7 +10,7 @@
         <meta name="description" content="Juego donde hacer volar un pájaro evitando obstáculos.">
 
         <!-- Estilos -->
-        <link rel="stylesheet" href="assets/css/styles.css?v=1.0">
+        <link rel="stylesheet" href="assets/css/styles.css?v=1.1">
 
         <!-- Favicon -->
         <link rel="icon" type="image/x-icon" href="assets/icon/favicon.ico">
@@ -23,21 +23,116 @@
 
     <body>
 
-        <div id="game-container">
-            <canvas id="game"></canvas>
-            <div id="score">0</div>
-            <div id="message">
-                <h1 style="text-align: center;">Flappy Bird<br>Clone</h1>
-                <p>
-                    CONTROL DEL JUEGO → Si tu dispositivo tiene pantalla táctil pequeña, pulsa en ella con la orientación vertical. Si tiene teclado, pulsa en la tecla "espacio". Si tiene ratón, haz clic.
-                </p>
-                <p>
-                    OBJETIVO DEL JUEGO → Pulsa o haz clic <u>repetidamente</u> para que vuele el pájaro, sin salirte del cielo azul ni chocarte contra las tuberías verdes.
-                </p>
-            </div>
-        </div>
+        <main id="game-container">
+            <canvas id="game" class="filtered"></canvas>
 
-        <script src="assets/js/app.js?v=1.0"></script>
+            <div id="score" class="hidden">0</div>
+
+            <section id="menu-screen" class="screen">
+                <h1>Flappy Bird Clone</h1>
+
+                <button id="show-tutorial">
+                    Ver tutorial
+                </button>
+
+                <button id="show-ranking">
+                    Ver ranking
+                </button>
+
+                <p>Para jugar, escoge un nivel:</p>
+
+                <button data-level="easy">
+                    Fácil 😍
+                </button>
+
+                <button data-level="normal">
+                    Normal 😊
+                </button>
+
+                <button data-level="hard">
+                    Difícil 😎
+                </button>
+            </section>
+
+            <section id="tutorial-screen" class="screen hidden">
+                <h2>TUTORIAL</h2>
+
+                <p>
+                    OBJETIVO DEL JUEGO → Pulsa o haz clic <u>muy repetidamente</u> para que vuele el pájaro,
+                    sin salirte del cielo azul ni chocarte contra las tuberías verdes.
+                </p>
+
+                <p>
+                    CONTROLES → Si tu dispositivo tiene pantalla táctil, tan sólo pulsa en ella. Si tiene
+                    teclado, pulsa en la tecla "espacio". Si tiene ratón periférico, haz clic.
+                </p>
+                
+                <button id="back-menu">
+                    Volver al menú
+                </button>
+            </section>
+
+            <section id="game-over-screen" class="screen hidden">
+                <h2>GAME OVER</h2>
+
+                <p>Puntuación: <strong id="final-score"></strong></p>
+
+                <input id="player-name" maxlength="17" placeholder="Escribe tu nombre..." type="text">
+
+                <button id="save-score">
+                    Guardar puntuación
+                </button>
+
+                <p>O bien...</p>
+
+                <button id="continue-to-menu">
+                    Continuar sin guardar
+                </button>
+            </section>
+
+            <section id="leaderboard-screen" class="screen hidden">
+                <h2>TOP 10</h2>
+
+                <div id="leaderboard"></div>
+
+                <button id="clear-all">
+                    Borrar todo
+                </button>
+
+                <button id="go-to-menu">
+                    Ir al menú
+                </button>
+            </section>
+
+            <dialog id="dialogoRanking" class="cuadroDialogo">
+                <h2>ATENCIÓN</h2>
+                
+                <p>¿Seguro que quieres borrar todo?</p>
+                
+                <button id="cancel-deletion">
+                    CANCELAR
+                </button>
+                
+                <button id="confirm-deletion">
+                    CONFIRMAR
+                </button>
+            </dialog>
+
+            <dialog id="dialogoOrientacion" class="cuadroDialogo">
+                <h2>ATENCIÓN</h2>
+                
+                <p>
+                    En la orientación horizontal tu dispositivo no tiene altura suficiente para jugar
+                    con comodidad. Cambia a la orientación vertical y a continuación recarga el juego.
+                </p>
+                
+                <button onclick="location.reload();">
+                    RECARGAR
+                </button>
+            </dialog>
+        </main>
+
+        <script src="assets/js/app.js?v=1.1"></script>
 
     </body>
 

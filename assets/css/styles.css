@@ -37,7 +37,7 @@ html, body {
     top: 20px;
     left: 20px;
 
-    color: whitesmoke;
+    color: #fdf5e6;
     font-size: 2rem;
     font-weight: bold;
 
@@ -48,26 +48,88 @@ html, body {
     pointer-events: none;
 }
 
-#message {
+.screen {
     position: absolute;
     display: flex;
     align-items: center;
     flex-direction: column;
     justify-content: center;
     margin: 5%;
-    top: 44px;
+    inset: 0;
     gap: 14px;
-    color: #222222;
-    pointer-events: none;
+    color: #fdf5e6;
+    max-height: 800px;
 }
 
-#message * {
-    margin-top: 0px;
-    margin-bottom: 0px;
+.screen * {
+    margin: 0;
 }
 
-#message.hidden {
+.hidden {
     display: none;
+}
+
+.filtered {
+    filter: opacity(0.22);
+}
+
+button, input {
+    width: 200px;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 100px;
+    font-weight: bold;
+    font-size: 1rem;
+    line-height: 2;
+    color: #222222;
+}
+
+button {
+    border: none;
+    background: #fdf5e6;
+    cursor: pointer;
+}
+
+input {
+    border: 4px dashed #222222;
+    background: #ffffff;
+    padding-left: 15px;
+}
+
+#leaderboard {
+    text-align: left;
+}
+
+.cuadroDialogo {
+    border-width: 2px;
+    border-radius: 8px;
+    background-color: #fdf5e6;
+    max-width: calc(100% - 80px);
+    max-height: calc(100% - 80px);
+    text-align: center;
+    text-wrap: balance;
+}
+
+.cuadroDialogo::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.cuadroDialogo * {
+    margin: 5px;
+}
+
+.cuadroDialogo button {
+    width: 150px;
+    color: #fdf5e6;
+    background-color: #222222;
+}
+
+.cuadroDialogo button#cancel-deletion {
+    background-color: #f06f06;
+}
+
+.cuadroDialogo button#confirm-deletion {
+    background-color: #008866;
 }
 
 @media (min-width: 450px) {

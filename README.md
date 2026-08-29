@@ -3,12 +3,14 @@
 Juego de habilidad, donde hacer volar un pájaro en dos dimensiones, teniendo cuidado de no salirse de la pantalla (cielo azul) ni tropezarse con los obstáculos (tuberías verdes). Es una imitación del juego original [Flappy Bird](https://es.wikipedia.org/wiki/Flappy_Bird) de 2013.
 
 
-## 📈 Versión 1.0.1
+## 📈 Versión 1.1.0
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000) ![HTML](https://img.shields.io/badge/HTML-%23E34F26.svg?logo=html5&logoColor=white) ![CSS](https://img.shields.io/badge/CSS-639?logo=css&logoColor=fff)
 
 Esta es una versión estable del proyecto, desarrollada únicamente con tecnologías Front-End nativas: JavaScript, HTML y CSS. Se utiliza la [API Canvas](https://developer.mozilla.org/es/docs/Web/API/Canvas_API) para el dibujado del pájaro y las tuberías.
 
 Se ha testado con éxito en diferentes tamaños de pantalla, incluso en la de un *iPhone 4*. La aplicación no necesita procesos de compilación, ni instalación de dependencias, ni conexión a Internet.
+
+En esta versión se puede elegir el nivel de dificultad y, al finalizar cada partida, las puntuaciones se pueden guardar en el `localStorage`, quedando las 10 mejores, pero se pueden borrar en cualquier momento.
 
 
 ## 🎮 Jugar *online*
@@ -66,4 +68,41 @@ flappy-bird/
 │       └── app.js              # Lógica principal del juego, incluye comentarios
 │
 └── index.html                  # Punto de entrada de la aplicación
+```
+
+
+## 🕹️ Dinámica del juego
+
+El flujo de la aplicación se repite cíclicamente y consiste en el siguiente:
+
+```bash
+    ┌───────────────────────┐
+┌───┤  Ver el menú inicial  ├────┬─────────────┐
+│   └───────────┬───────────┘    │             │
+▲               │                │             │
+│               ▼                ▼             ▼
+│   ┌───────────────────────┐    │             │
+│   │ Seleccionar nivel de  │    │             │
+│   │  dificultad entre 3   │    │             │
+│   └───────────┬───────────┘    │             │
+▲               │                │             │
+│               ▼                ▼             ▼
+│   ┌───────────────────────┐    │    ┌─────────────────┐
+│   │   Jugar una partida   │    │    │ Ver el tutorial │
+│   └───────────┬───────────┘    │    └────────┬────────┘
+▲               │                │             │
+│               ▼                ▼             ▼
+│   ┌───────────────────────┐    │             │
+│   │ Guardar la puntuación │    │             │
+│   └───────────┬───────────┘    │             │
+▲               │                │             │
+│               ▼                ▼             ▼
+│   ┌───────────────────────┐    │             │
+│   │    Ver el ranking     │ ← ─┘             │
+│   └───────────┬───────────┘                  │
+▲               │                              │
+│               ▼                              ▼
+│   ┌───────────────────────┐                  │
+└───┤  Ir al menú inicial   │ ← ───────────────┘
+    └───────────────────────┘
 ```
