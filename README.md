@@ -3,7 +3,7 @@
 Juego de habilidad, donde hacer volar un pájaro en dos dimensiones, teniendo cuidado de no salirse de la pantalla (cielo azul) ni tropezarse con los obstáculos (tuberías verdes). Es una imitación del juego original [Flappy Bird](https://es.wikipedia.org/wiki/Flappy_Bird) de 2013.
 
 
-## 📈 Versión 1.0.0
+## 📈 Versión 1.0.1
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000) ![HTML](https://img.shields.io/badge/HTML-%23E34F26.svg?logo=html5&logoColor=white) ![CSS](https://img.shields.io/badge/CSS-639?logo=css&logoColor=fff)
 
 Esta es una versión estable del proyecto, desarrollada únicamente con tecnologías Front-End nativas: JavaScript, HTML y CSS. Se utiliza la [API Canvas](https://developer.mozilla.org/es/docs/Web/API/Canvas_API) para el dibujado del pájaro y las tuberías.

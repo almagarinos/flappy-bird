@@ -1,12 +1,12 @@
-// Variables globales
-/*
+// Variables globales y configuración
+
+// Configuración de la partida
 const GAME_CONFIG = {
-    gravity: 0.30,
-    jumpForce: -5,
-    pipeSpeed: 2,
-    pipeGap: 200
+    gravity: 0.2, // Velocidad de caída. Cuanto más baja sea, más despacio cae el pájaro.
+    jumpForce: -3, // Longitud del salto, puede ser decimal. Cuanto más corto, más manejable.
+    pipeGap: 250, // Espacio vertical en cada columna de tuberías. Cuanto mayor: más fácil.
+    pipeSpeed: 0.9 // Velocidad del movimiento de las tuberías. Cuanto menor: más lentas.
 };
-*/
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
@@ -26,35 +26,48 @@ if (window.innerHeight < 800) {
 const scoreElement = document.getElementById("score");
 const messageElement = document.getElementById("message");
 
+
+
+// Estado global
 const bird = {
     x: 80,
     y: 120,
     radius: 16,
     velocity: 0,
-    /*
-     * Velocidad de caída. Cuanto más baja: más despacio cae.
-     * "GAME_CONFIG.gravity"
-     */
-    gravity: 0.2,
-    /*
-     * Longitud del salto, puede ser decimal. Cuanto más corto, más manejable.
-     * "GAME_CONFIG.jumpForce"
-     */
-    jumpForce: -3
+    gravity: GAME_CONFIG.gravity,
+    jumpForce: GAME_CONFIG.jumpForce
 };
 
 const pipes = [];
 
-
-
-// Estado
 let score = 0;
 let started = false;
 let gameOver = false;
+// Fin del estado global
 
 
 
-// Funciones
+// Funciones de la aplicación
+
+// Crear nueva partida con sus valores iniciales
+function restart() {
+    bird.y = 120; // Mismo valor que al iniciarlo en el estado global
+    bird.velocity = 0; // Mismo valor que al iniciarlo en el estado global
+
+    pipes.length = 0;
+
+    score = 0; // Contador de puntos a cero
+    scoreElement.textContent = 0;
+
+    started = false;
+    gameOver = false;
+
+    messageElement.classList.remove("hidden");
+}
+
+
+
+// Salto del pájaro gracias a su aleteo
 function jump() {
     if (gameOver) {
         restart();
@@ -67,13 +80,10 @@ function jump() {
     bird.velocity = bird.jumpForce;
 }
 
-function createPipe() {
-    /*
-     * Espacio vertical en cada columna de tuberías. Cuanto mayor: más fácil.
-     * "GAME_CONFIG.pipeGap"
-     */
-    const gap = 250;
 
+
+// Crear cada tubería
+function createPipe() {
     pipes.push({
         /*
          * Esta variable x es el espacio horizontal entre columnas de tuberías.
@@ -84,32 +94,29 @@ function createPipe() {
         x: canvas.width + ( canvas.width / 2 ),
         width: 60, // Ancho de cada tubería, cuando mayor sea, más difícil el juego 
         // A continuación se garantiza que mínimo tendrá 50 px arriba o 50 px abajo
-        topHeight: 50 + Math.random() * (canvas.height - 100 - gap),
-        gap,
+        topHeight: 50 + Math.random() * (canvas.height - 100 - GAME_CONFIG.pipeGap),
+        gap: GAME_CONFIG.pipeGap,
         passed: false
     });
 }
 
+
+
+// Física del pájaro
 function updateBird() {
     bird.velocity += bird.gravity;
     bird.y += bird.velocity;
 
-    if (
-        bird.y < 0 ||
-        bird.y > canvas.height
-    ) {
+    if (bird.y < 0 || bird.y > canvas.height) {
         gameOver = true;
     }
 }
 
+// Física de las tuberías
 function updatePipes() {
     pipes.forEach(pipe => {
 
-        /*
-        * Velocidad del movimiento de las tuberías. Cuanto menor: más lentas.
-        * "GAME_CONFIG.pipeSpeed"
-        */
-        pipe.x -= 0.9;
+        pipe.x -= GAME_CONFIG.pipeSpeed;
 
         const insideX =
             bird.x + bird.radius > pipe.x &&
@@ -119,17 +126,13 @@ function updatePipes() {
             bird.y - bird.radius < pipe.topHeight;
 
         const hitBottom =
-            bird.y + bird.radius >
-            pipe.topHeight + pipe.gap;
+            bird.y + bird.radius > pipe.topHeight + pipe.gap;
 
         if (insideX && (hitTop || hitBottom)) {
             gameOver = true;
         }
 
-        if (
-            !pipe.passed &&
-            pipe.x + pipe.width < bird.x
-        ) {
+        if (!pipe.passed && pipe.x + pipe.width < bird.x) {
             pipe.passed = true;
             score++;
 
@@ -151,6 +154,9 @@ function updatePipes() {
     }
 }
 
+
+
+// Dibuja y colorea el pájaro
 function drawBird() {
     ctx.save();
 
@@ -181,7 +187,7 @@ function drawBird() {
 
 
     // Ojo del pájaro
-    ctx.fillStyle = "#000";
+    ctx.fillStyle = "#222222";
 
     ctx.beginPath();
         ctx.arc(
@@ -207,6 +213,7 @@ function drawBird() {
     ctx.restore();
 }
 
+// Dibuja y colorea las tuberías
 function drawPipes() {
     ctx.fillStyle = "#008866";
 
@@ -228,7 +235,10 @@ function drawPipes() {
     });
 }
 
-function render() {
+
+
+// Render del canvas
+function renderGame() {
     ctx.clearRect(
         0,
         0,
@@ -236,65 +246,55 @@ function render() {
         canvas.height
     );
 
-    drawPipes();
     drawBird();
+    drawPipes();
 }
 
-function restart() {
-    bird.y = 120; // Mismo valor que al iniciarlo
-    bird.velocity = 0;
 
-    pipes.length = 0;
 
-    score = 0;
-    scoreElement.textContent = 0;
-
-    started = false;
-    gameOver = false;
-
-    messageElement.classList.remove("hidden");
-}
-
-function loop() {
+// Game loop de la aplicación
+function gameLoop() {
     if (started && !gameOver) {
         updateBird();
         updatePipes();
     }
 
-    render();
+    renderGame();
 
-    requestAnimationFrame(loop);
+    requestAnimationFrame(gameLoop);
 }
+// Fin del game loop
 
 
 
-// Eventos
+// Eventos de la aplicación
+
+// Listener de teclado
 window.addEventListener("keydown", event => {
     if (event.code === "Space") {
         jump();
     }
 });
 
+// Listener de ratón
 window.addEventListener('mousedown', function(e) {
     // Evita la selección de texto y el comportamiento de arrastre por defecto
     e.preventDefault();
     
-    // Acciones de ratón a continuación
+    // Acción de ratón
     jump();
 });
 
+// Listener de pantalla táctil
 window.addEventListener('touchstart', function(e) {
     // Evita el comportamiento por defecto (scroll, zoom o selección)
     e.preventDefault();
 
-    // Acciones táctiles a continuación
+    // Acción táctil
     jump();
 }, { passive: false });
-
-// Otra opción siempre que se haga clic dentro del canvas, no fuera:
-// canvas.addEventListener("click", jump);
 
 
 
 // Iniciar la aplicación
-loop();
+gameLoop();

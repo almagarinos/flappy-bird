@@ -1,12 +1,16 @@
-/* Pantalla completa */
 html, body {
     margin: 0;
     padding: 0;
     width: 100%;
     height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
     background: #222222;
     font-family: Arial, sans-serif;
     font-weight: bold;
+    font-size: 1rem;
     overflow: hidden;
 }
 
@@ -19,30 +23,13 @@ html, body {
 #game {
     /* Para quitar barras de scroll */
     display: block;
-
     /* Color del cielo del fondo */
     background: #2bbfff;
-
     /* Para pantallas táctiles */
     touch-action: none;
-
     /* Para clics de ratón */
     user-select: none;
     -webkit-user-select: none;
-}
-
-#data-container {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-#data {
-    width: 100%;
-    height: 100%;
-    position: relative;
 }
 
 #score {
@@ -66,20 +53,21 @@ html, body {
     display: flex;
     align-items: center;
     flex-direction: column;
-    width: 90%;
+    justify-content: center;
     margin: 5%;
-    top: 22px;
-    text-align: start;
+    top: 44px;
+    gap: 14px;
     color: #222222;
     pointer-events: none;
 }
 
 #message * {
+    margin-top: 0px;
     margin-bottom: 0px;
 }
 
-.hidden {
-    display: none !important;
+#message.hidden {
+    display: none;
 }
 
 @media (min-width: 450px) {
@@ -87,19 +75,9 @@ html, body {
         display: flex;
         align-items: center;
         justify-content: center;
-    }
-
-    #data-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    #data {
         width: 450px;
         height: 100dvh;
         max-height: 800px;
-        position: relative;
     }
 }
 
