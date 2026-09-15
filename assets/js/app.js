@@ -87,11 +87,11 @@ function visualizacionCorrecta() {
 // Gestión de localStorage
 function getScores() {
     // Si no hay datos, se devuelve un objeto vacío
-    return JSON.parse(localStorage.getItem("flappy-scores")) || [];
+    return JSON.parse(localStorage.getItem("flappy-bird-scores")) || [];
 }
 
 function saveScores(scores) {
-    localStorage.setItem("flappy-scores", JSON.stringify(scores));
+    localStorage.setItem("flappy-bird-scores", JSON.stringify(scores));
 }
 // Fin de la gestión de localStorage
 
@@ -465,7 +465,7 @@ document.getElementById("clear-all").addEventListener("click",() => dialogRankin
 document.getElementById("cancel-deletion").addEventListener("click",() => dialogRanking.close());
 
 document.getElementById("confirm-deletion").addEventListener("click",() => {
-    localStorage.clear();
+    localStorage.removeItem("flappy-bird-scores");
     document.getElementById("leaderboard").innerHTML = `Acabas de borrar estos datos.`;
     dialogRanking.close();
 });
