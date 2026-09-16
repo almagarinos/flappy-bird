@@ -67,6 +67,10 @@ flappy-bird/
 │   └── js/
 │       └── app.js              # Lógica principal del juego, incluye comentarios
 │
+├── LICENSE.md                  # Archivo de licencia MIT en formato Markdown
+│
+├── README.md                   # Archivo "Léeme" del proyecto en Markdown
+│
 └── index.html                  # Punto de entrada de la aplicación
 ```
 
