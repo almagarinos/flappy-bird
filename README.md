@@ -79,7 +79,7 @@ flappy-bird/
 
 El flujo de la aplicación se repite cíclicamente y consiste en el siguiente:
 
-```bash
+```text
     ┌───────────────────────┐
 ┌───┤  Ver el menú inicial  ├────┬─────────────┐
 │   └───────────┬───────────┘    │             │
@@ -102,11 +102,11 @@ El flujo de la aplicación se repite cíclicamente y consiste en el siguiente:
 ▲               │                │             │
 │               ▼                ▼             ▼
 │   ┌───────────────────────┐    │             │
-│   │    Ver el ranking     │ ← ─┘             │
+│   │    Ver el ranking     │ ◄──┘             │
 │   └───────────┬───────────┘                  │
 ▲               │                              │
 │               ▼                              ▼
 │   ┌───────────────────────┐                  │
-└───┤  Ir al menú inicial   │ ← ───────────────┘
+└───┤  Ir al menú inicial   │ ◄────────────────┘
     └───────────────────────┘
 ```
